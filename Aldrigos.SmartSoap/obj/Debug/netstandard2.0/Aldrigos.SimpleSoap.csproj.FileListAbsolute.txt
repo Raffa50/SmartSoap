@@ -1,9 +1,0 @@
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\bin\Debug\netstandard2.0\Aldrigos.SimpleSoap.deps.json
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\bin\Debug\netstandard2.0\Aldrigos.SimpleSoap.dll
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\bin\Debug\netstandard2.0\Aldrigos.SimpleSoap.pdb
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.csprojAssemblyReference.cache
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.csproj.CoreCompileInputs.cache
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.AssemblyInfoInputs.cache
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.AssemblyInfo.cs
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.dll
-C:\Users\Reloa\Desktop\Aldrigos.SimpleSoap\Aldrigos.SimpleSoap\obj\Debug\netstandard2.0\Aldrigos.SimpleSoap.pdb
