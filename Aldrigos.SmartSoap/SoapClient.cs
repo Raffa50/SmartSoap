@@ -8,16 +8,29 @@ namespace Aldrigos.SmartSoap
 {
     internal class SoapClient : ISoapClient
     {
-        public Uri BaseUri { get; private set; }
+        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IXmlSerializer xmlSerializer;
+
+        public Uri BaseUrl { get; private set; }
 
         public IReadOnlyDictionary<string, string> AdditionalXlmns { get; private set; }
 
-        public Task<T> SendAsync<T>(object body, params object[] headers) {
-            throw new NotImplementedException();
-            //return SendAsync<T>( new SoapMessage( body, headers ) );
+        public SoapClient(Uri baseUrl, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
+            : this(baseUrl, null, httpClientFactory, xmlSerializer) { }
+
+        public SoapClient(Uri baseUrl, IReadOnlyDictionary<string, string> additionalXlmns, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
+        {
+            this.BaseUrl = baseUrl;
+            this.AdditionalXlmns = additionalXlmns ?? new Dictionary<string,string>();
+            this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
 
-        public Task<T> SendAsync<T>(SoapMessage message) {
+        public Task<T> SendAsync<T>(object body, params object[] headers) {
+            return SendAsync<T>( new Envelope( body, headers ) );
+        }
+
+        public Task<T> SendAsync<T>(Envelope message) {
             var client = new HttpClient();
 
             throw new NotImplementedException();
