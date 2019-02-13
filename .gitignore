@@ -2,4 +2,6 @@
 # Il file gitignore è stato creato automaticamente da Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/Aldrigos.SmartSoap/v15
+bin/
+obj/
+.vs/
