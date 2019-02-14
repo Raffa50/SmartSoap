@@ -36,6 +36,17 @@ namespace Aldrigos.SmartSoap
             {
                 var attributeProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .Where(p => p.GetCustomAttributes<XmlAttributeAttribute>().Any());
+                foreach(var attr in attributeProps)
+                {
+                    if( !attr.PropertyType.GetInterfaces().Contains(typeof(IConvertible)) )
+                        throw new InvalidOperationException("Properties marked with XmlAttributes must extend IConvertible");
+
+                    var attrName = attr.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
+                    if (string.IsNullOrWhiteSpace(attrName))
+                        attrName = attr.Name;
+
+                    xmlWriter.WriteAttributeString(attrName, attr.GetValue(o, null).ToString());
+                }
 
                 var elementProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .Where(p => !p.GetCustomAttributes<NonSerializedAttribute>().Any() && !p.GetCustomAttributes<XmlAttributeAttribute>().Any());
@@ -44,7 +55,9 @@ namespace Aldrigos.SmartSoap
                     var xmlElementAttr = element.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault();
                     var subElementName = xmlElementAttr?.ElementName ?? element.Name;
 
-                    SerializeElement(element.GetValue(0, null), subElementName, xmlWriter);
+                    var value = element.GetValue(o, null);
+                    if(value != null)
+                        SerializeElement(value, subElementName, xmlWriter);
                 }
             }
 
