@@ -13,16 +13,15 @@ namespace Aldrigos.SmartSoap
         private readonly IXmlSerializer xmlSerializer;
 
         public Uri BaseUrl { get; private set; }
-
-        public IReadOnlyDictionary<string, string> AdditionalXlmns { get; private set; }
+        public IReadOnlyDictionary<string, string> httpHeaders { get; private set; }
 
         public SoapClient(Uri baseUrl, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
             : this(baseUrl, null, httpClientFactory, xmlSerializer) { }
 
-        public SoapClient(Uri baseUrl, IReadOnlyDictionary<string, string> additionalXlmns, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
+        public SoapClient(Uri baseUrl, IReadOnlyDictionary<string, string> httpHeaders, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
         {
             this.BaseUrl = baseUrl;
-            this.AdditionalXlmns = additionalXlmns ?? new Dictionary<string,string>();
+            this.httpHeaders = httpHeaders ?? new Dictionary<string,string>();
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
