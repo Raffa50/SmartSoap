@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aldrigos.SmartSoap.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -26,14 +27,42 @@ namespace Aldrigos.SmartSoap
             this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
 
-        public Task<T> SendAsync<T>(object body, params object[] headers) {
-            return SendAsync<T>( new Envelope( body, headers ) );
+        public Task<T> SendAsync<T>(string method, object body, params object[] headers) {
+            return SendAsync<T>( method, new Envelope( body, headers ) );
         }
 
-        public async Task<T> SendAsync<T>(Envelope message) {
+        public async Task<T> SendAsync<T>(string method, Envelope message) {
             var client = httpClientFactory.CreateClient();
 
-            throw new NotImplementedException();
+            string content;
+            try
+            {
+                content = xmlSerializer.SerializeObject(message);
+            } catch(Exception ex)
+            {
+                throw new InvalidOperationException("Error during serialization", ex);
+            }
+
+            using (var request = new HttpRequestMessage(HttpMethod.Post, new Uri(BaseUrl, method))
+            {
+                Content = new StringContent(content, Encoding.UTF8, "text/xml")
+            })
+            {
+                using (var response = await client.SendAsync(request))
+                {
+                    if (!response.IsSuccessStatusCode)
+                        throw new SoapCallException("Soap call failed", response);
+
+                    try
+                    {
+                        return xmlSerializer.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException("Error during derialization", ex);
+                    }
+                }
+            }
         }
     }
 }
