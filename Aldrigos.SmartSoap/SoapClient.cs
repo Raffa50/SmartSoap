@@ -30,8 +30,8 @@ namespace Aldrigos.SmartSoap
             return SendAsync<T>( new Envelope( body, headers ) );
         }
 
-        public Task<T> SendAsync<T>(Envelope message) {
-            var client = new HttpClient();
+        public async Task<T> SendAsync<T>(Envelope message) {
+            var client = httpClientFactory.CreateClient();
 
             throw new NotImplementedException();
         }

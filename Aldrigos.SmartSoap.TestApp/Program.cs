@@ -1,4 +1,5 @@
 ﻿using Aldrigos.SmartSoap;
+using Aldrigos.SmartSoap.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,12 @@ using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap.TestApp
 {
+    [XmlNameSpace("my", "http://aldrigo.sf.net/")]
     public class C
     {
         public string s { get; set; } = "cebolla";
         public string Null { get; set; }
+        public CipollaType Cipolla { get; set; } = CipollaType.Rosse;
     };
     public class Test
     {

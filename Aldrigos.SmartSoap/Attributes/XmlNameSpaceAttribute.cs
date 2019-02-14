@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Aldrigos.SmartSoap.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public class XmlNameSpaceAttribute : Attribute
     {
         public string Name { get; private set; }

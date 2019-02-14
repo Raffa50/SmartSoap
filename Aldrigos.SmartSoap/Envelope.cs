@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aldrigos.SmartSoap.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,10 +7,12 @@ using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap
 {
+    [XmlNameSpace("soap", "http://schemas.xmlsoap.org/soap/envelope/")]
     public class Envelope
     {
+        [XmlElement("Body", Namespace = "soap")]
         public object Body { get; set; }
-        [XmlElement("Header")]
+        [XmlElement("Header", Namespace = "soap")]
         public IEnumerable<object> Headers { get; set; }
 
         public Envelope()
@@ -18,7 +21,7 @@ namespace Aldrigos.SmartSoap
         }
 
         public Envelope( object body )
-        : base()
+        : this()
         {
             Body = body;
         }

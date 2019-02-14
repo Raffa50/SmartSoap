@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Aldrigos.SmartSoap.Attributes;
+using Aldrigos.SmartSoap.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,21 +20,54 @@ namespace Aldrigos.SmartSoap
         }
 
         public string SerializeObject( object o ) {
-            var stream = new StringBuilder();
-            using( var xmlWriter = XmlWriter.Create( stream ) ) {
-                xmlWriter.WriteStartDocument();
-                SerializeElement(o, o.GetType().Name, xmlWriter);
+            using (var stream = new MemoryStream())
+            {
+                using (var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8 }))
+                {
+                    xmlWriter.WriteStartDocument();
+                    SerializeElement(o, o.GetType().Name, xmlWriter, new Dictionary<string, string>());
+                }
+
+                stream.Seek(0, SeekOrigin.Begin);
+                using (var reader = new StreamReader(stream))
+                    return reader.ReadToEnd();
             }
-            return stream.ToString();
         }
 
-        private void SerializeElement( object o, string elementName, XmlWriter xmlWriter ) {
-            xmlWriter.WriteStartElement(elementName);
+        private void SerializeElement( object o, string elementName, XmlWriter xmlWriter, IDictionary<string, string> nameSpaces, string ns = null ) {
+            if (ns != null)
+            {
+                if (!nameSpaces.Keys.Contains(ns))
+                    throw new InvalidOperationException($"NameSpace '{ns}' must be defined before");
+                xmlWriter.WriteStartElement(ns, elementName, nameSpaces[ns]);
+            }
+            else
+            {
+                var nsAttr = o.GetType().GetCustomAttributes<XmlNameSpaceAttribute>().FirstOrDefault();
+                if (nsAttr != null)
+                {
+                    if (!nameSpaces.Keys.Contains(nsAttr.Name))
+                        nameSpaces.Add(nsAttr.Name, nsAttr.Value);
 
-            if (o is IConvertible)
+                    xmlWriter.WriteStartElement(nsAttr.Name, elementName, nameSpaces[nsAttr.Name]);
+                }
+                else
+                    xmlWriter.WriteStartElement(elementName);
+            }
+
+            if(o is Enum)
+            {
+                var @enum = (Enum)o;
+                xmlWriter.WriteString(@enum.ToEnumString());
+            }
+            else if (o is IConvertible)
                 xmlWriter.WriteString(o.ToString());
             else if (o is IEnumerable)
-                SerializeCollection((IEnumerable)o, xmlWriter);
+            {
+                var en = (IEnumerable)o;
+                foreach (var el in en)
+                    SerializeElement(el, el.GetType().Name, xmlWriter, nameSpaces);
+            }
             else
             {
                 var attributeProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -57,18 +93,11 @@ namespace Aldrigos.SmartSoap
 
                     var value = element.GetValue(o, null);
                     if(value != null)
-                        SerializeElement(value, subElementName, xmlWriter);
+                        SerializeElement(value, subElementName, xmlWriter, nameSpaces, xmlElementAttr?.Namespace);
                 }
             }
 
             xmlWriter.WriteEndElement();
-        }
-
-        private void SerializeCollection(IEnumerable o, XmlWriter xmlWriter)
-        {
-            foreach (var el in o) {
-                SerializeElement(el, el.GetType().Name, xmlWriter);
-            }
         }
     }
 }

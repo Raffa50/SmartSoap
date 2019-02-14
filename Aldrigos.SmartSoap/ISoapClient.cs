@@ -8,7 +8,6 @@ namespace Aldrigos.SmartSoap
     public interface ISoapClient
     {
         Uri BaseUrl { get; }
-        IReadOnlyDictionary<string, string> AdditionalXlmns { get; }
         Task<T> SendAsync<T>( object body, params object[] headers );
         Task<T> SendAsync<T>( Envelope message );
     }
