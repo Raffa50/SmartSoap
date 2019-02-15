@@ -47,6 +47,9 @@ namespace Aldrigos.SmartSoap
                 Content = new StringContent(content, Encoding.UTF8, "text/xml")
             })
             {
+                foreach (var header in httpHeaders)
+                    request.Headers.Add(header.Key, header.Value);
+
                 using (var response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
