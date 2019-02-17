@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Aldrigos.SmartSoap.Factories
 {
-    class SoapClientFactory
+    public sealed class SoapClientFactory
     {
     }
 }

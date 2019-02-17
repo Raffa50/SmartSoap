@@ -39,9 +39,11 @@ namespace Aldrigos.SmartSoap.TestApp
         static void Main(string[] args)
         {
             var ser = new SimpleXmlSerializer();
-            string s = ser.SerializeObject(new Envelope(new Test(), new[] { new C() }));
+            string s = ser.SerializeObject(new Envelope<Test>(new Test(), new[] { new C() }));
             Console.WriteLine(s);
-            Console.ReadKey();
+            //Console.ReadKey();
+
+            ser.DeserializeObject<Envelope<Test>>( s );
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Aldrigos.SmartSoap
     public interface ISoapClient
     {
         Uri BaseUrl { get; }
-        Task<T> SendAsync<T>( string method, object body, params object[] headers );
-        Task<T> SendAsync<T>( string method, Envelope message );
+        Task<TRet> SendAsync<TRet, TBody>( string method, TBody body, params object[] headers ) where TRet : class;
+        Task<TRet> SendAsync<TRet, TBody>( string method, Envelope<TBody> message ) where TRet : class;
     }
 }

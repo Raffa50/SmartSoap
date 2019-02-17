@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Aldrigos.SmartSoap
 {
-    internal class SoapClient : ISoapClient
+    public sealed class SoapClient : ISoapClient
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IXmlSerializer xmlSerializer;
@@ -26,11 +26,13 @@ namespace Aldrigos.SmartSoap
             this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
 
-        public Task<T> SendAsync<T>(string method, object body, params object[] headers) {
-            return SendAsync<T>( method, new Envelope( body, headers ) );
+        public Task<TRet> SendAsync<TRet, TBody>(string method, TBody body, params object[] headers) where TRet : class
+        {
+            return SendAsync<TRet, TBody>( method, new Envelope<TBody>( body, headers ) );
         }
 
-        public async Task<T> SendAsync<T>(string method, Envelope message) {
+        public async Task<TRet> SendAsync<TRet, TBody>(string method, Envelope<TBody> message) where TRet : class
+        {
             var client = httpClientFactory.CreateClient();
 
             string content;
@@ -57,7 +59,7 @@ namespace Aldrigos.SmartSoap
 
                     try
                     {
-                        return xmlSerializer.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+                        return xmlSerializer.DeserializeObject<TRet>(await response.Content.ReadAsStringAsync());
                     }
                     catch (Exception ex)
                     {
