@@ -3,7 +3,7 @@ using Aldrigos.SmartSoap.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -75,7 +75,8 @@ namespace Aldrigos.SmartSoap
                 if (xmlElement.HasElements)
                 {
                     var elementProps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                        .Where(p => p.CanWrite && p.SetMethod != null && !p.GetCustomAttributes<NonSerializedAttribute>().Any() && !p.GetCustomAttributes<XmlAttributeAttribute>().Any());
+                        .Where(p => p.CanWrite && p.SetMethod != null && 
+                            !Attribute.IsDefined(p, typeof(NotMappedAttribute)) && !Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
 
                     foreach (var subEl in xmlElement.Elements())
                     {

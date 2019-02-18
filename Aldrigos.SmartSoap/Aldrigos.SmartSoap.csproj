@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>7.3</LangVersion>
+    <Authors>Aldrigo Raffaele</Authors>
+    <Company>Aldrigos</Company>
+    <Copyright>Aldrigo Raffaele</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>http://aldrigos.sf.net</PackageProjectUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/Raffa50/SmartSoap</RepositoryUrl>
+    <Description>Simple Soap client and better XmlSerializer</Description>
   </PropertyGroup>
 
   <ItemGroup>

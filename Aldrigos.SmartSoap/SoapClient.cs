@@ -12,7 +12,7 @@ namespace Aldrigos.SmartSoap
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IXmlSerializer xmlSerializer;
 
-        public Uri BaseUrl { get; set; } = new Uri("");
+        public Uri BaseUrl { get; set; }
         public IDictionary<string, string> HttpHeaders { get; private set; } = new Dictionary<string, string>();
 
         public SoapClient(IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
@@ -28,6 +28,7 @@ namespace Aldrigos.SmartSoap
 
         public async Task<TRet> SendAsync<TRet, TBody>(string method, Envelope<TBody> message) where TRet : class
         {
+            var url = BaseUrl == null ? new Uri(method) : new Uri(BaseUrl, method);
             var client = httpClientFactory.CreateClient();
 
             string content;
@@ -38,7 +39,7 @@ namespace Aldrigos.SmartSoap
             {
                 throw new InvalidOperationException("Error during serialization", ex);
             }
-
+            
             using (var request = new HttpRequestMessage(HttpMethod.Post, new Uri(BaseUrl, method))
             {
                 Content = new StringContent(content, Encoding.UTF8, "text/xml")
