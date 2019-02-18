@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 
@@ -7,7 +8,8 @@ namespace Aldrigos.SmartSoap.Exceptions
     [Serializable]
     public class SoapCallException : Exception
     {
-        public HttpResponseMessage Response { get; private set; }
+        public HttpStatusCode ResponseStatusCode { get; }
+        public string ResponseContent { get; }
 
         public SoapCallException()
         {
@@ -17,9 +19,10 @@ namespace Aldrigos.SmartSoap.Exceptions
         {
         }
 
-        public SoapCallException(string message, HttpResponseMessage response) : this(message)
+        public SoapCallException(string message, HttpStatusCode responseStatusCode, string responseContent) : this(message)
         {
-            this.Response = response;
+            this.ResponseStatusCode = responseStatusCode;
+            this.ResponseContent = responseContent;
         }
 
         public SoapCallException(string message, Exception innerException) : base(message, innerException)

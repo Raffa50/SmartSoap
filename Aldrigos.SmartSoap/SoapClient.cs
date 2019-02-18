@@ -12,16 +12,11 @@ namespace Aldrigos.SmartSoap
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IXmlSerializer xmlSerializer;
 
-        public Uri BaseUrl { get; private set; }
-        public IReadOnlyDictionary<string, string> httpHeaders { get; private set; }
+        public Uri BaseUrl { get; set; } = new Uri("");
+        public IDictionary<string, string> HttpHeaders { get; private set; } = new Dictionary<string, string>();
 
-        public SoapClient(Uri baseUrl, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
-            : this(baseUrl, null, httpClientFactory, xmlSerializer) { }
-
-        public SoapClient(Uri baseUrl, IReadOnlyDictionary<string, string> httpHeaders, IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
+        public SoapClient(IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
         {
-            this.BaseUrl = baseUrl;
-            this.httpHeaders = httpHeaders ?? new Dictionary<string,string>();
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
@@ -49,13 +44,13 @@ namespace Aldrigos.SmartSoap
                 Content = new StringContent(content, Encoding.UTF8, "text/xml")
             })
             {
-                foreach (var header in httpHeaders)
+                foreach (var header in HttpHeaders)
                     request.Headers.Add(header.Key, header.Value);
 
                 using (var response = await client.SendAsync(request))
                 {
                     if (!response.IsSuccessStatusCode)
-                        throw new SoapCallException("Soap call failed", response);
+                        throw new SoapCallException("Soap call failed", response.StatusCode, await response.Content.ReadAsStringAsync());
 
                     try
                     {
