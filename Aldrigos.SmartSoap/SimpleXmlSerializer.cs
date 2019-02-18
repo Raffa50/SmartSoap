@@ -18,149 +18,141 @@ namespace Aldrigos.SmartSoap
     public sealed class SimpleXmlSerializer : IXmlSerializer
     {
         public T DeserializeObject<T>(string s) where T : class {
-            T ret;
-            try {
-                ret = Activator.CreateInstance<T>();
-            } catch( MissingMemberException ex ) {
-                throw new SerializationException(typeof(T).Name + " cannot be serialized because it does not have a parameterless constructor.", ex);
-            }
-
             using (var stream = new StringReader(s))
             using( var xmlReader = XmlReader.Create( stream ) ) {
                 xmlReader.MoveToContent();
-                DeserializeObject( ret, typeof(T).GetCleanName(), xmlReader );
-            }
+                XElement xmlElement = XNode.ReadFrom( xmlReader ) as XElement;
 
-            return ret;
-        }
+                if (xmlElement.Name.LocalName != typeof(T).GetCleanName())
+                    throw new SerializationException($"Expected element with name='{typeof(T).GetCleanName()}' but got '{xmlElement.Name.LocalName}'");
 
-        private void DeserializeObject( object o, string elementName, XmlReader xmlReader ) {
-            if( xmlReader.NodeType != XmlNodeType.Element )
-                throw new SerializationException("Deserialization error. Expected element "+ elementName);
-
-            XElement xmlElement = XNode.ReadFrom( xmlReader ) as XElement;
-            if(xmlElement == null)
-                throw new SerializationException("Can't read node for "+ elementName);
-            if( xmlElement.Name.LocalName != elementName )
-                throw new SerializationException($"Expected element '{elementName}' but got "+xmlElement.Name.LocalName);
-
-            if( xmlElement.HasAttributes ) {
-                var attributeProps = o.GetType().GetProperties( BindingFlags.Public | BindingFlags.Instance )
-                    .Where( p => p.CanWrite && Attribute.IsDefined( p, typeof(XmlAttributeAttribute) ) );
-
-                if (attributeProps.Any())
-                    foreach (var xmlAttr in xmlElement.Attributes())
-                    {
-                        if (xmlAttr.Value == "null")
-                            continue;
-
-                        var matchingProp = attributeProps.FirstOrDefault( p => p.Name == xmlAttr.Name );
-                        if( matchingProp == null ) {
-                            matchingProp = attributeProps.FirstOrDefault(
-                                p => p.GetCustomAttribute<XmlAttributeAttribute>().AttributeName == xmlAttr.Name );
-
-                            if( matchingProp == null )
-                                continue;
-                        }
-
-                        DeserializeBasicType(o, matchingProp, xmlAttr.Value);
-                    }
-            }
-
-            if( xmlElement.HasElements ) {
-                var elementProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.CanWrite && !p.GetCustomAttributes<NonSerializedAttribute>().Any() && !p.GetCustomAttributes<XmlAttributeAttribute>().Any());
-
-                foreach( var subEl in xmlElement.Elements() ) {
-                    var subElName = subEl.Name.LocalName;
-
-                    var matchingProp = elementProps.FirstOrDefault( p => p.Name == subElName );
-                    if( matchingProp == null ) {
-                        matchingProp = elementProps.Where( p => Attribute.IsDefined( p, typeof(XmlElementAttribute) ) )
-                            .FirstOrDefault(
-                                p => p.GetCustomAttribute<XmlElementAttribute>().ElementName == subElName );
-
-                        if( matchingProp == null )
-                            continue;
-                    }
-
-                    DeserializeElement(o, matchingProp, subEl);
-                }
+                return (T)DeserializeObject( typeof(T), xmlElement);
             }
         }
 
-        private void DeserializeElement(object o, PropertyInfo matchingProp, XElement subEl)
+        private object DeserializeObject(Type type, XElement xmlElement)
         {
-            if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IConvertible)))
-                DeserializeBasicType(o, matchingProp, subEl.Value);
-            else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)))
-            {
-                var col = DeserializeList(matchingProp, subEl);
-                matchingProp.SetValue(o, col);
-            }
-            else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IDictionary)))
+            if (xmlElement.Value == "null")
+                return null;
+            if (type.GetInterfaces().Contains(typeof(IConvertible)))
+                return DeserializeBasicType(type, xmlElement.Value);
+            else if (type.GetInterfaces().Contains(typeof(IEnumerable)))
+                return DeserializeList(type, xmlElement.Elements());
+            else if (type.GetInterfaces().Contains(typeof(IDictionary)))
                 throw new NotSupportedException("Dictionaries are not supported");
-            else if (matchingProp.PropertyType.IsInterface)
+            else if (type.IsInterface)
                 throw new SerializationException("Can't deserialize interfaces");
             else
             {
-                var sc = Activator.CreateInstance(matchingProp.PropertyType);
-                matchingProp.SetValue(o, sc);
+                var sc = Activator.CreateInstance(type);
 
-                var reader = subEl.CreateReader();
-                reader.Read();
-                DeserializeObject(sc, subEl.Name.LocalName, reader);
+                if (xmlElement.HasAttributes)
+                {
+                    var attributeProps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(p => p.CanWrite && Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
+
+                    if (attributeProps.Any())
+                        foreach (var xmlAttr in xmlElement.Attributes())
+                        {
+                            if (xmlAttr.Value == "null")
+                                continue;
+
+                            var matchingProp = attributeProps.FirstOrDefault(p => p.Name == xmlAttr.Name);
+                            if (matchingProp == null)
+                            {
+                                matchingProp = attributeProps.FirstOrDefault(
+                                    p => p.GetCustomAttribute<XmlAttributeAttribute>().AttributeName == xmlAttr.Name);
+
+                                if (matchingProp == null)
+                                    continue;
+                            }
+
+                            var value = DeserializeBasicType(matchingProp.PropertyType, xmlAttr.Value);
+                            matchingProp.SetValue(sc, value);
+                        }
+                }
+
+                if (xmlElement.HasElements)
+                {
+                    var elementProps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(p => p.CanWrite && p.SetMethod != null && !p.GetCustomAttributes<NonSerializedAttribute>().Any() && !p.GetCustomAttributes<XmlAttributeAttribute>().Any());
+
+                    foreach (var subEl in xmlElement.Elements())
+                    {
+                        var subElName = subEl.Name.LocalName;
+
+                        var matchingProp = elementProps.FirstOrDefault(p => p.Name == subElName);
+                        if (matchingProp == null)
+                        {
+                            matchingProp = elementProps.Where(p => Attribute.IsDefined(p, typeof(XmlElementAttribute)))
+                                .FirstOrDefault(
+                                    p => p.GetCustomAttribute<XmlElementAttribute>().ElementName == subElName);
+
+                            if (matchingProp == null)
+                                continue;
+                        }
+
+                        var value = DeserializeObject(matchingProp.PropertyType, subEl);
+                        matchingProp.SetValue(sc, value);
+                    }
+                }
+
+                return sc;
             }
         }
 
-        private object DeserializeList(PropertyInfo matchingProp, XElement subEl)
+        private ICollection DeserializeList(Type type, IEnumerable<XElement> elements)
         {
-            ICollection col;
-            if (matchingProp.PropertyType.IsInterface)
+            var elementsType = type.GetElementType() ?? type.GenericTypeArguments[0];
+            var elArray = Array.CreateInstance(elementsType, elements.Count());
+            int i = 0;
+            foreach (var el in elements)
+            {
+                elArray.SetValue(DeserializeObject(elementsType, el), i++);
+            }
+
+            if (type.IsArray)
+                return elArray;
+
+            if (type.IsInterface)
             {
                 var listType = typeof(List<>);
-                var constructedListType = listType.MakeGenericType(matchingProp.PropertyType.GenericTypeArguments[0]);
+                var constructedListType = listType.MakeGenericType(elementsType);
 
-                col = (ICollection)Activator.CreateInstance(constructedListType);
+                return (ICollection)Activator.CreateInstance(constructedListType, elArray);
             }
-            else
-                col = (ICollection)Activator.CreateInstance(matchingProp.PropertyType);
-
-            foreach(var el in subEl.Elements())
-            {
-                //DeserializeElement(col, matchingProp, el);
-            }
-
-            return col;
+            return (ICollection)Activator.CreateInstance(type, elArray);
         }
 
-        private void DeserializeBasicType( object o, PropertyInfo prop, string value ) {
-            if( prop.PropertyType.IsEnum ) {
-                Enum enumValue = value.ToEnum( prop.PropertyType );
-                prop.SetValue( o, enumValue );
-            } else if( prop.PropertyType.GetInterfaces().Contains( typeof(IConvertible) ) ) {
-                if( prop.PropertyType == typeof(string) )
-                    prop.SetValue( o, value );
-                else if( prop.PropertyType == typeof(bool) )
-                    prop.SetValue( o, bool.Parse( value ) );
-                else if(prop.PropertyType == typeof(char))
-                    prop.SetValue( o, char.Parse( value ) );
-                else if(prop.PropertyType == typeof(byte))
-                    prop.SetValue( o, byte.Parse( value ) );
-                else if(prop.PropertyType == typeof(short))
-                    prop.SetValue( o, short.Parse( value ) );
-                else if(prop.PropertyType == typeof(int))
-                    prop.SetValue( o, int.Parse( value ) );
-                else if(prop.PropertyType == typeof(long))
-                    prop.SetValue( o, long.Parse( value ) );
-                else if(prop.PropertyType == typeof(float))
-                    prop.SetValue( o, float.Parse( value ) );
-                else if(prop.PropertyType == typeof(double))
-                    prop.SetValue( o, double.Parse( value ) );
+        private object DeserializeBasicType(Type type, string value)
+        {
+            if (type.IsEnum)
+                return value.ToEnum(type);
+            else if (type.GetInterfaces().Contains(typeof(IConvertible)))
+            {
+                if (type == typeof(string))
+                    return value;
+                else if (type == typeof(bool))
+                    return bool.Parse(value);
+                else if (type == typeof(char))
+                    return char.Parse(value);
+                else if (type == typeof(byte))
+                    return byte.Parse(value);
+                else if (type == typeof(short))
+                    return short.Parse(value);
+                else if (type == typeof(int))
+                    return int.Parse(value);
+                else if (type == typeof(long))
+                    return long.Parse(value);
+                else if (type == typeof(float))
+                    return float.Parse(value);
+                else if (type == typeof(double))
+                    return double.Parse(value);
                 else
-                    throw new SerializationException("Invalid basic type "+ prop.PropertyType.Name);
-            } else
-                throw new SerializationException( $"Can't deserialize {prop.Name} with value "+value );
+                    throw new SerializationException("Invalid basic type " + type.Name);
+            }
+            else
+                throw new SerializationException($"Can't deserialize {type.Name} with value " + value);
         }
 
         public string SerializeObject( object o ) {
