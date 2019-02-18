@@ -54,7 +54,8 @@ namespace Aldrigos.SmartSoap
 
                     try
                     {
-                        return xmlSerializer.DeserializeObject<TRet>(await response.Content.ReadAsStringAsync());
+                        var resp= xmlSerializer.DeserializeObject<Envelope<TRet>>(await response.Content.ReadAsStringAsync());
+                        return resp.Body;
                     }
                     catch (Exception ex)
                     {
