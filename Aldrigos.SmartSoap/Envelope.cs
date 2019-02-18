@@ -13,7 +13,7 @@ namespace Aldrigos.SmartSoap
         [XmlElement("Body", Namespace = "soap")]
         public virtual T Body { get; set; }
         [XmlElement("Header", Namespace = "soap")]
-        public virtual IEnumerable<object> Headers { get; set; }
+        public virtual IEnumerable<object> Headers { get; }
 
         public Envelope()
         {
