@@ -48,16 +48,6 @@ namespace Aldrigos.SmartSoap
                 var attributeProps = o.GetType().GetProperties( BindingFlags.Public | BindingFlags.Instance )
                     .Where( p => p.CanWrite && Attribute.IsDefined( p, typeof(XmlAttributeAttribute) ) );
 
-                //foreach (var attrProp in attributeProps)
-                //{
-                //    var attrName = attrProp.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
-                //    if (string.IsNullOrWhiteSpace(attrName))
-                //        attrName = attrProp.Name;
-
-                //    var attrValue = xmlReader.GetAttribute(attrName);
-                //    DeserializeBasicType(o, attrProp, attrValue);
-                //}
-
                 if (attributeProps.Any())
                     foreach (var xmlAttr in xmlElement.Attributes())
                     {
@@ -94,27 +84,54 @@ namespace Aldrigos.SmartSoap
                             continue;
                     }
 
-                    if(matchingProp.PropertyType.GetInterfaces().Contains( typeof(IConvertible) ))
-                        DeserializeBasicType( o, matchingProp, subEl.Value );
-                    else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)))
-                    {
-                        //TODO deserialize collection
-                        //var col = DeserializeList( matchingProp, subEl );
-                    }
-                    else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IDictionary)))
-                        throw new NotSupportedException("Dictionaries are not supported");
-                    else if (matchingProp.PropertyType.IsInterface)
-                        throw new SerializationException("Can't deserialize interfaces");
-                    else {
-                        var sc = Activator.CreateInstance( matchingProp.PropertyType );
-                        matchingProp.SetValue(o, sc);
-
-                        var reader = subEl.CreateReader();
-                        reader.Read();
-                        DeserializeObject( sc, subElName, reader);
-                    }
+                    DeserializeElement(o, matchingProp, subEl);
                 }
             }
+        }
+
+        private void DeserializeElement(object o, PropertyInfo matchingProp, XElement subEl)
+        {
+            if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IConvertible)))
+                DeserializeBasicType(o, matchingProp, subEl.Value);
+            else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+            {
+                var col = DeserializeList(matchingProp, subEl);
+                matchingProp.SetValue(o, col);
+            }
+            else if (matchingProp.PropertyType.GetInterfaces().Contains(typeof(IDictionary)))
+                throw new NotSupportedException("Dictionaries are not supported");
+            else if (matchingProp.PropertyType.IsInterface)
+                throw new SerializationException("Can't deserialize interfaces");
+            else
+            {
+                var sc = Activator.CreateInstance(matchingProp.PropertyType);
+                matchingProp.SetValue(o, sc);
+
+                var reader = subEl.CreateReader();
+                reader.Read();
+                DeserializeObject(sc, subEl.Name.LocalName, reader);
+            }
+        }
+
+        private object DeserializeList(PropertyInfo matchingProp, XElement subEl)
+        {
+            ICollection col;
+            if (matchingProp.PropertyType.IsInterface)
+            {
+                var listType = typeof(List<>);
+                var constructedListType = listType.MakeGenericType(matchingProp.PropertyType.GenericTypeArguments[0]);
+
+                col = (ICollection)Activator.CreateInstance(constructedListType);
+            }
+            else
+                col = (ICollection)Activator.CreateInstance(matchingProp.PropertyType);
+
+            foreach(var el in subEl.Elements())
+            {
+                //DeserializeElement(col, matchingProp, el);
+            }
+
+            return col;
         }
 
         private void DeserializeBasicType( object o, PropertyInfo prop, string value ) {
