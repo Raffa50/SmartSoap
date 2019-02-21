@@ -1,5 +1,4 @@
-﻿using Aldrigos.SmartSoap.Attributes;
-using Aldrigos.SmartSoap.Extensions;
+﻿using Aldrigos.SmartSoap.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -180,13 +179,18 @@ namespace Aldrigos.SmartSoap
             }
             else
             {
-                var nsAttr = o.GetType().GetCustomAttributes<XmlNameSpaceAttribute>().FirstOrDefault();
+                var nsAttr = o.GetType().GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
                 if (nsAttr != null)
                 {
-                    if (!nameSpaces.Keys.Contains(nsAttr.Name))
-                        nameSpaces.Add(nsAttr.Name, nsAttr.Value);
+                    if (string.IsNullOrEmpty(nsAttr.TypeName))
+                        xmlWriter.WriteStartElement(elementName, nsAttr.Namespace);
+                    else
+                    {
+                        if (!nameSpaces.Keys.Contains(nsAttr.TypeName))
+                            nameSpaces.Add(nsAttr.TypeName, nsAttr.Namespace);
 
-                    xmlWriter.WriteStartElement(nsAttr.Name, elementName, nameSpaces[nsAttr.Name]);
+                        xmlWriter.WriteStartElement(nsAttr.TypeName, elementName, nameSpaces[nsAttr.TypeName]);
+                    }
                 }
                 else
                     xmlWriter.WriteStartElement(elementName);

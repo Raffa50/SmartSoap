@@ -1,11 +1,11 @@
-﻿using Aldrigos.SmartSoap.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap.Test.DneModels
 {
-    [XmlNameSpace("t", "http://tempuri.org/")]
+    [XmlType(Namespace = "http://tempuri.org/")]
     public class Add
     {
         public int intA { get; set; }

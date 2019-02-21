@@ -26,7 +26,8 @@ namespace Tests
         {
             var add = new Add() { intA = 1, intB = 1 };
             var client = new SoapClient(httpClientFactory) { BaseUrl = new Uri("http://www.dneonline.com/") };
-            var resp = await client.SendAsync<AddResponse, AddRequestBody>("calculator.asmx", new AddRequestBody { Add = add });
+            var resp = await client.SendAsync<AddResponse, Add>("calculator.asmx", add);
+            Assert.That(resp.AddResult, Is.EqualTo(2));
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Aldrigos.SmartSoap;
-using Aldrigos.SmartSoap.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap.TestApp
 {
-    [XmlNameSpace("my", "http://aldrigo.sf.net/")]
+    [XmlType("my", Namespace = "http://aldrigo.sf.net/")]
     public class C
     {
         public string s { get; set; }
