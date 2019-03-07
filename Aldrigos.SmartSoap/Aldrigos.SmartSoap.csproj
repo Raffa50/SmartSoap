@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -11,6 +11,13 @@
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/Raffa50/SmartSoap</RepositoryUrl>
     <Description>Simple Soap client and better XmlSerializer</Description>
+    <PackageIconUrl>https://raw.githubusercontent.com/Raffa50/SmartSoap/master/soap-icon.png</PackageIconUrl>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <Version>1.0.2</Version>
+    <PackageLicenseUrl>https://licenses.nuget.org/LGPL-3.0-only</PackageLicenseUrl>
+    <PackageReleaseNotes>Added factories to support better dependecy injection</PackageReleaseNotes>
+    <PackageTags>SOAP, serialization, XML</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
