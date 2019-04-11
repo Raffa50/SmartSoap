@@ -12,11 +12,13 @@
     <RepositoryUrl>https://github.com/Raffa50/SmartSoap</RepositoryUrl>
     <Description>Simple Soap client and better XmlSerializer</Description>
     <PackageIconUrl>https://raw.githubusercontent.com/Raffa50/SmartSoap/master/soap-icon.png</PackageIconUrl>
-    <AssemblyVersion>1.0.2.0</AssemblyVersion>
-    <FileVersion>1.0.2.0</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
     <PackageLicenseUrl>https://licenses.nuget.org/LGPL-3.0-only</PackageLicenseUrl>
-    <PackageReleaseNotes>Added factories to support better dependecy injection</PackageReleaseNotes>
+    <PackageReleaseNotes>BREAKING CHANGES
+XmlType is read and considered TypeName as the name of the element
+using XDocument for serialziation</PackageReleaseNotes>
     <PackageTags>SOAP, serialization, XML</PackageTags>
   </PropertyGroup>
 

@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Aldrigos.SmartSoap.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap
 {
-    [XmlType("soap", Namespace = "http://schemas.xmlsoap.org/soap/envelope/")]
+    [Xmlns("http://schemas.xmlsoap.org/soap/envelope/", "soap")]
     public class Envelope<T>
     {
-        [XmlElement("Body", Namespace = "soap")]
-        public virtual T[] Body { get; set; }
-        [XmlElement("Header", Namespace = "soap")]
+        public virtual T[] Body { get; }
         public virtual IEnumerable<object> Headers { get; } = Enumerable.Empty<object>();
 
         public Envelope() { }

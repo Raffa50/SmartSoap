@@ -2,14 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Aldrigos.SmartSoap.TestApp
 {
-    [XmlType("my", Namespace = "http://aldrigo.sf.net/")]
+    [XmlType(Namespace = "http://aldrigo.sf.net/")]
     public class C
     {
         public string s { get; set; }
@@ -32,7 +29,7 @@ namespace Aldrigos.SmartSoap.TestApp
     {
         static void Main(string[] args)
         {
-            var t = new Test()
+            var t = new Test
             {
                 Attribute = "Attribute1",
                 A = "asd",
@@ -44,7 +41,7 @@ namespace Aldrigos.SmartSoap.TestApp
                 },
                 Numbers = new int[] { 1, 2, 3 },
                 ccs = new List<C> { new C { s = "Inner" } }
-        };
+            };
 
             var ser = new SimpleXmlSerializer();
             string s = ser.SerializeObject(new Envelope<Test>(t, new[] { new C() }));
