@@ -1,4 +1,5 @@
-﻿using Aldrigos.SmartSoap.Extensions;
+﻿using Aldrigos.SmartSoap.Attributes;
+using Aldrigos.SmartSoap.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,16 +17,20 @@ namespace Aldrigos.SmartSoap
 {
     public sealed class SimpleXmlSerializer : IXmlSerializer
     {
-        public T DeserializeObject<T>(string s) where T : class {
+        #region Deserializer
+        public T DeserializeObject<T>(string s) where T : class
+        {
             using (var stream = new StringReader(s))
-            using( var xmlReader = XmlReader.Create( stream ) ) {
+            using (var xmlReader = XmlReader.Create(stream))
+            {
                 xmlReader.MoveToContent();
-                XElement xmlElement = XNode.ReadFrom( xmlReader ) as XElement;
+                XElement xmlElement = XNode.ReadFrom(xmlReader) as XElement;
 
-                if (xmlElement.Name.LocalName != typeof(T).GetCleanName())
-                    throw new SerializationException($"Expected element with name='{typeof(T).GetCleanName()}' but got '{xmlElement.Name.LocalName}'");
+                var elementName = GetXmlTypeName(typeof(T));
+                if (xmlElement.Name.LocalName != elementName)
+                    throw new SerializationException($"Expected element with name='{elementName}' but got '{xmlElement.Name.LocalName}'");
 
-                return (T)DeserializeObject( typeof(T), xmlElement);
+                return (T)DeserializeObject(typeof(T), xmlElement);
             }
         }
 
@@ -74,7 +79,7 @@ namespace Aldrigos.SmartSoap
                 if (xmlElement.HasElements)
                 {
                     var elementProps = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                        .Where(p => p.CanWrite && p.SetMethod != null && 
+                        .Where(p => p.CanWrite && p.SetMethod != null &&
                             !Attribute.IsDefined(p, typeof(NotMappedAttribute)) && !Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
 
                     foreach (var subEl in xmlElement.Elements())
@@ -154,14 +159,17 @@ namespace Aldrigos.SmartSoap
             else
                 throw new SerializationException($"Can't deserialize {type.Name} with value " + value);
         }
+        #endregion
 
-        public string SerializeObject( object o ) {
+        #region Serializer
+        public string SerializeObject(object o)
+        {
             using (var stream = new MemoryStream())
             {
+                var document = new XDocument(SerializeElement(o, GetXmlTypeName(o.GetType()), null));
                 using (var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8 }))
                 {
-                    xmlWriter.WriteStartDocument();
-                    SerializeElement(o, o.GetType().GetCleanName(), xmlWriter, new Dictionary<string, string>());
+                    document.WriteTo(xmlWriter);
                 }
 
                 stream.Seek(0, SeekOrigin.Begin);
@@ -170,81 +178,98 @@ namespace Aldrigos.SmartSoap
             }
         }
 
-        private void SerializeElement( object o, string elementName, XmlWriter xmlWriter, IDictionary<string, string> nameSpaces, string ns = null ) {
-            if (ns != null)
+        private XElement CreateElement(object o, string elementName, out XNamespace childNs)
+        {
+            childNs = null;
+            var nsAttr = o.GetType().GetCustomAttributes<XmlnsAttribute>().FirstOrDefault();
+            if(nsAttr != null)
             {
-                if (!nameSpaces.Keys.Contains(ns))
-                    throw new SerializationException($"NameSpace '{ns}' must be defined before");
-                xmlWriter.WriteStartElement(ns, elementName, nameSpaces[ns]);
-            }
-            else
-            {
-                var nsAttr = o.GetType().GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
-                if (nsAttr != null)
-                {
-                    if (string.IsNullOrEmpty(nsAttr.TypeName))
-                        xmlWriter.WriteStartElement(elementName, nsAttr.Namespace);
-                    else
-                    {
-                        if (!nameSpaces.Keys.Contains(nsAttr.TypeName))
-                            nameSpaces.Add(nsAttr.TypeName, nsAttr.Namespace);
+                if (nsAttr.UseForChilds)
+                    childNs = nsAttr.Namespace;
 
-                        xmlWriter.WriteStartElement(nsAttr.TypeName, elementName, nameSpaces[nsAttr.TypeName]);
-                    }
-                }
+                if (!string.IsNullOrEmpty(nsAttr.Prefix))
+                    return new XElement(nsAttr.Namespace + elementName,
+                        new XAttribute(XNamespace.Xmlns + nsAttr.Prefix, nsAttr.Namespace)
+                    );
                 else
-                    xmlWriter.WriteStartElement(elementName);
+                    return new XElement(nsAttr.Namespace + elementName);
             }
 
-            if(o is Enum)
+            var typeAttr = o.GetType().GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(typeAttr?.Namespace))
+                return new XElement(elementName);
+
+            return new XElement(XNamespace.Get(typeAttr.Namespace) + elementName);
+        }
+
+        private XElement SerializeElement(object o, string elementName, XNamespace ns)
+        {
+            XNamespace childNs = null;
+            XElement element = ns != null ?
+                new XElement(ns + elementName) :
+                CreateElement(o, elementName, out childNs);
+
+            if (o is Enum)
             {
                 var @enum = (Enum)o;
-                xmlWriter.WriteString(@enum.ToEnumString());
+                element.Value = @enum.ToEnumString();
             }
             else if (o is IConvertible)
-                xmlWriter.WriteString(o.ToString());
-            else if(o is IDictionary)
+                element.Value = o.ToString();
+            else if (o is IDictionary)
                 throw new NotSupportedException("Dictionaries are not supported");
             else if (o is IEnumerable)
             {
                 var en = (IEnumerable)o;
                 foreach (var el in en)
-                    SerializeElement(el, el.GetType().Name, xmlWriter, nameSpaces);
+                    element.Add(SerializeElement(el, GetXmlTypeName(el.GetType()), childNs));
             }
             else
             {
                 var attributeProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.CanRead && Attribute.IsDefined( p, typeof(XmlAttributeAttribute) ));
-                foreach(var attr in attributeProps)
+                    .Where(p => p.CanRead && Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
+                foreach (var attr in attributeProps)
                 {
-                    if( !attr.PropertyType.GetInterfaces().Contains(typeof(IConvertible)) )
+                    if (!attr.PropertyType.GetInterfaces().Contains(typeof(IConvertible)))
                         throw new NotSupportedException("Properties marked with XmlAttributes must extend IConvertible");
 
                     var attrName = attr.GetCustomAttribute<XmlAttributeAttribute>().AttributeName;
                     if (string.IsNullOrWhiteSpace(attrName))
                         attrName = attr.Name;
 
-                    if( attr.PropertyType.IsEnum ) {
-                        Enum enumVal = (Enum)attr.GetValue( o, null );
-                        xmlWriter.WriteAttributeString( attrName, enumVal.ToEnumString() );
-                    } else
-                        xmlWriter.WriteAttributeString(attrName, attr.GetValue(o, null).ToString());
+                    if (attr.PropertyType.IsEnum)
+                    {
+                        Enum enumVal = (Enum)attr.GetValue(o, null);
+                        element.SetAttributeValue(attrName, enumVal.ToEnumString());
+                    }
+                    else
+                        element.SetAttributeValue(attrName, attr.GetValue(o, null).ToString());
                 }
 
                 var elementProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.CanRead && !Attribute.IsDefined( p, typeof(NonSerializedAttribute) ) && !Attribute.IsDefined( p, typeof(XmlAttributeAttribute) ));
-                foreach (var element in elementProps)
+                    .Where(p => p.CanRead && !Attribute.IsDefined(p, typeof(NonSerializedAttribute)) && !Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
+                foreach (var childEl in elementProps)
                 {
-                    var xmlElementAttr = element.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault();
-                    var subElementName = xmlElementAttr?.ElementName ?? element.Name;
+                    var xmlElementAttr = childEl.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault();
+                    string subElementName = xmlElementAttr?.ElementName ?? childEl.Name;
 
-                    var value = element.GetValue(o, null);
-                    if(value != null)
-                        SerializeElement(value, subElementName, xmlWriter, nameSpaces, xmlElementAttr?.Namespace);
+                    var value = childEl.GetValue(o, null);
+                    if (value != null)
+                        element.Add(SerializeElement(value, subElementName, childNs));
                 }
+
             }
 
-            xmlWriter.WriteEndElement();
+            return element;
+        }
+        #endregion
+
+        private string GetXmlTypeName(Type t)
+        {
+            var nsAttr = t.GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
+            return !string.IsNullOrWhiteSpace(nsAttr?.TypeName) ?
+                nsAttr.TypeName :
+                t.GetCleanName();
         }
     }
 }
