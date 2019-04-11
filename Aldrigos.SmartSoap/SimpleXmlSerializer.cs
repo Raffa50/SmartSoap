@@ -26,8 +26,9 @@ namespace Aldrigos.SmartSoap
                 xmlReader.MoveToContent();
                 XElement xmlElement = XNode.ReadFrom(xmlReader) as XElement;
 
-                if (xmlElement.Name.LocalName != typeof(T).GetCleanName())
-                    throw new SerializationException($"Expected element with name='{typeof(T).GetCleanName()}' but got '{xmlElement.Name.LocalName}'");
+                var elementName = GetXmlTypeName(typeof(T));
+                if (xmlElement.Name.LocalName != elementName)
+                    throw new SerializationException($"Expected element with name='{elementName}' but got '{xmlElement.Name.LocalName}'");
 
                 return (T)DeserializeObject(typeof(T), xmlElement);
             }
@@ -165,7 +166,7 @@ namespace Aldrigos.SmartSoap
         {
             using (var stream = new MemoryStream())
             {
-                var document = new XDocument(SerializeElement(o, GetXmlTypeName(o), null));
+                var document = new XDocument(SerializeElement(o, GetXmlTypeName(o.GetType()), null));
                 using (var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = Encoding.UTF8 }))
                 {
                     document.WriteTo(xmlWriter);
@@ -175,14 +176,6 @@ namespace Aldrigos.SmartSoap
                 using (var reader = new StreamReader(stream))
                     return reader.ReadToEnd();
             }
-        }
-
-        private string GetXmlTypeName(object o)
-        {
-            var nsAttr = o.GetType().GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
-            return !string.IsNullOrWhiteSpace(nsAttr?.TypeName) ?
-                nsAttr.TypeName :
-                o.GetType().GetCleanName();
         }
 
         private XElement CreateElement(object o, string elementName, out XNamespace childNs)
@@ -229,7 +222,7 @@ namespace Aldrigos.SmartSoap
             {
                 var en = (IEnumerable)o;
                 foreach (var el in en)
-                    element.Add(SerializeElement(el, GetXmlTypeName(el), childNs));
+                    element.Add(SerializeElement(el, GetXmlTypeName(el.GetType()), childNs));
             }
             else
             {
@@ -270,5 +263,13 @@ namespace Aldrigos.SmartSoap
             return element;
         }
         #endregion
+
+        private string GetXmlTypeName(Type t)
+        {
+            var nsAttr = t.GetCustomAttributes<XmlTypeAttribute>().FirstOrDefault();
+            return !string.IsNullOrWhiteSpace(nsAttr?.TypeName) ?
+                nsAttr.TypeName :
+                t.GetCleanName();
+        }
     }
 }
