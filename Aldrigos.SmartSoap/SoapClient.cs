@@ -1,9 +1,10 @@
-﻿using Aldrigos.SmartSoap.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Aldrigos.SmartSoap.Exceptions;
+using Aldrigos.SmartSoap.Extensions;
 
 namespace Aldrigos.SmartSoap
 {
@@ -14,6 +15,7 @@ namespace Aldrigos.SmartSoap
 
         public Uri BaseUrl { get; set; }
         public IDictionary<string, string> HttpHeaders { get; private set; } = new Dictionary<string, string>();
+        public SoapContentType SoapContentType { get; set; } = SoapContentType.TextXml;
 
         public SoapClient(IHttpClientFactory httpClientFactory, IXmlSerializer xmlSerializer = null)
         {
@@ -42,7 +44,7 @@ namespace Aldrigos.SmartSoap
             
             using (var request = new HttpRequestMessage(HttpMethod.Post, new Uri(BaseUrl, method))
             {
-                Content = new StringContent(content, Encoding.UTF8, "text/xml")
+                Content = new StringContent(content, Encoding.UTF8, SoapContentType.ToEnumString())
             })
             {
                 foreach (var header in HttpHeaders)
