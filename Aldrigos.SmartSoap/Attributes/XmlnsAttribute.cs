@@ -5,6 +5,7 @@ using System.Xml.Linq;
 
 namespace Aldrigos.SmartSoap.Attributes
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
     public class XmlnsAttribute : Attribute
     {
         public XNamespace Namespace { get; set; }
