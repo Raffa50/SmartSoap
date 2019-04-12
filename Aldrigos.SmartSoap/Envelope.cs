@@ -8,8 +8,8 @@ namespace Aldrigos.SmartSoap
     [Xmlns("http://schemas.xmlsoap.org/soap/envelope/", "soap")]
     public class Envelope<T>
     {
-        public virtual T[] Body { get; }
-        public virtual IEnumerable<object> Headers { get; } = Enumerable.Empty<object>();
+        public virtual T[] Body { get; set; }
+        public virtual IEnumerable<object> Headers { get; set; } = Enumerable.Empty<object>();
 
         public Envelope() { }
 
