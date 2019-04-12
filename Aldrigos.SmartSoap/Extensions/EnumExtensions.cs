@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Aldrigos.SmartSoap.Extensions
 {
-    internal static class EnumExtensions
+    public static class EnumExtensions
     {
         public static string ToEnumString(this Enum enumValue)
         {
