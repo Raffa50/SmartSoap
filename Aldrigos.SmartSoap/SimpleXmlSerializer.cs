@@ -18,7 +18,7 @@ namespace Aldrigos.SmartSoap
     public sealed class SimpleXmlSerializer : IXmlSerializer
     {
         #region Deserializer
-        public T DeserializeObject<T>(string s) where T : class
+        public object DeserializeObject(Type t, string s)
         {
             using (var stream = new StringReader(s))
             using (var xmlReader = XmlReader.Create(stream))
@@ -26,11 +26,11 @@ namespace Aldrigos.SmartSoap
                 xmlReader.MoveToContent();
                 XElement xmlElement = XNode.ReadFrom(xmlReader) as XElement;
 
-                string elementName = GetXmlTypeName2(typeof(T)).LocalName;
+                string elementName = GetXmlTypeName2(t).LocalName;
                 if (xmlElement.Name.LocalName != elementName)
                     throw new SerializationException($"Expected element with name='{elementName}' but got '{xmlElement.Name.LocalName}'");
 
-                return (T)DeserializeObject(typeof(T), xmlElement);
+                return DeserializeObject(t, xmlElement);
             }
         }
 

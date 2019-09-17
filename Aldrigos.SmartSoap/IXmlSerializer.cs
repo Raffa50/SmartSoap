@@ -7,6 +7,6 @@ namespace Aldrigos.SmartSoap
     public interface IXmlSerializer
     {
         string SerializeObject(object o);
-        T DeserializeObject<T>(string s) where T : class;
+        object DeserializeObject(Type t, string s);
     }
 }
