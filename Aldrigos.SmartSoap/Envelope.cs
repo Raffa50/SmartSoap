@@ -6,10 +6,11 @@ using System.Linq;
 namespace Aldrigos.SmartSoap
 {
     [Xmlns("http://schemas.xmlsoap.org/soap/envelope/", "soap")]
-    public class Envelope<T>
+    public class Envelope<T> : IEnvelope where T : class
     {
         public virtual T[] Body { get; set; }
         public virtual IEnumerable<object> Headers { get; set; } = Enumerable.Empty<object>();
+        object[] IEnvelope.Body => Body;
 
         public Envelope() { }
 

@@ -23,12 +23,12 @@ namespace Aldrigos.SmartSoap
             this.xmlSerializer = xmlSerializer ?? new SimpleXmlSerializer();
         }
 
-        public Task<TRet> SendAsync<TRet, TBody>(string method, TBody body, params object[] headers) where TRet : class
+        public Task<TRet> SendAsync<TRet, TBody>(string method, TBody body, params object[] headers) where TRet : class where TBody : class
         {
             return SendAsync<TRet, TBody>( method, new Envelope<TBody>( body, headers ) );
         }
 
-        public async Task<TRet> SendAsync<TRet, TBody>(string method, Envelope<TBody> message) where TRet : class
+        public async Task<TRet> SendAsync<TRet, TBody>(string method, Envelope<TBody> message) where TRet : class where TBody : class
         {
             var url = BaseUrl == null ? new Uri(method) : new Uri(BaseUrl, method);
             var client = httpClientFactory.CreateClient();

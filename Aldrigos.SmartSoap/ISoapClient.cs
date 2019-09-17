@@ -10,7 +10,7 @@ namespace Aldrigos.SmartSoap
         Uri BaseUrl { get; set; }
         SoapContentType SoapContentType { get; set; }
         IDictionary<string, string> HttpHeaders { get; }
-        Task<TRet> SendAsync<TRet, TBody>( string method, TBody body, params object[] headers ) where TRet : class;
-        Task<TRet> SendAsync<TRet, TBody>( string method, Envelope<TBody> message ) where TRet : class;
+        Task<TRet> SendAsync<TRet, TBody>( string method, TBody body, params object[] headers ) where TRet : class where TBody : class;
+        Task<TRet> SendAsync<TRet, TBody>( string method, Envelope<TBody> message ) where TRet : class where TBody : class;
     }
 }
