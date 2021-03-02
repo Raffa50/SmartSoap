@@ -11,7 +11,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/Raffa50/SmartSoap</RepositoryUrl>
     <Description>Simple Soap client and better XmlSerializer</Description>
-    <PackageIconUrl>https://raw.githubusercontent.com/Raffa50/SmartSoap/master/soap-icon.png</PackageIconUrl>
+    <PackageIcon>soap-icon.png</PackageIcon>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <AssemblyVersion>1.3.1.0</AssemblyVersion>
     <FileVersion>1.3.1.0</FileVersion>
@@ -25,6 +25,10 @@ public EnumExtensions</PackageReleaseNotes>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\soap-icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

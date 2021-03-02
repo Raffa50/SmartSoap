@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aldrigos.SmartSoap.AspNet",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{F5821D7F-CA84-48D7-B1B2-223A93488375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aldrigos.SmartSoap.AspNet.TestApi31", "Test\Aldrigos.SmartSoap.AspNet.TestApi\Aldrigos.SmartSoap.AspNet.TestApi31.csproj", "{C4F09F04-9632-4F8C-8884-078EACF09419}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aldrigos.SmartSoap.AspNet.TestApi31", "Test\Aldrigos.SmartSoap.AspNet.TestApi\Aldrigos.SmartSoap.AspNet.TestApi31.csproj", "{C4F09F04-9632-4F8C-8884-078EACF09419}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
