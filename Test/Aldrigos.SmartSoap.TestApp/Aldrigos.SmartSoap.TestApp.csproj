@@ -58,7 +58,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Aldrigos.SmartSoap\Aldrigos.SmartSoap.csproj">
+    <ProjectReference Include="..\..\Aldrigos.SmartSoap\Aldrigos.SmartSoap.csproj">
       <Project>{724fa103-2932-423b-9486-bba3e5037548}</Project>
       <Name>Aldrigos.SmartSoap</Name>
     </ProjectReference>

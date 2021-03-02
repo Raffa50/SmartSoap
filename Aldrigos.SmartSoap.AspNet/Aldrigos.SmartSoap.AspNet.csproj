@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Aldrigo Raffaele</Authors>
     <Company>Aldrigos</Company>
     <Copyright>Aldrigo Raffaele</Copyright>
@@ -14,19 +14,13 @@
     <Description>Middleware to create an AspNet Core 2 SOAP endpoint</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>7.3</LangVersion>
+    <Version>1.3.1.0</Version>
+    <AssemblyVersion>1.3.1.0</AssemblyVersion>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.*" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.*" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.*" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
