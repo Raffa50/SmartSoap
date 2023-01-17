@@ -242,7 +242,10 @@ namespace Aldrigos.SmartSoap
                 }
 
                 var elementProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.CanRead && !Attribute.IsDefined(p, typeof(NonSerializedAttribute)) && !Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
+                    .Where(p => p.CanRead && 
+                    !Attribute.IsDefined(p, typeof(NonSerializedAttribute)) && 
+                    !Attribute.IsDefined(p, typeof(XmlIgnoreAttribute)) &&
+                    !Attribute.IsDefined(p, typeof(XmlAttributeAttribute)));
                 foreach (var childEl in elementProps)
                 {
                     var xmlElementAttr = childEl.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault();
