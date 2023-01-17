@@ -13,9 +13,9 @@
     <Description>Simple Soap client and better XmlSerializer</Description>
     <PackageIcon>soap-icon.png</PackageIcon>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
+    <Version>2.0.1</Version>
     <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <PackageReleaseNotes>may result in serialization-time BREAKING CHANGES from 1.X.X
 public EnumExtensions</PackageReleaseNotes>

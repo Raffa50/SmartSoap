@@ -238,7 +238,11 @@ namespace Aldrigos.SmartSoap
                         element.SetAttributeValue(attrName, enumVal.ToEnumString());
                     }
                     else
-                        element.SetAttributeValue(attrName, attr.GetValue(o, null).ToString());
+                    {
+                        var value = attr.GetValue(o, null);
+                        if(value != null)
+                            element.SetAttributeValue(attrName, value.ToString());
+                    }
                 }
 
                 var elementProps = o.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
