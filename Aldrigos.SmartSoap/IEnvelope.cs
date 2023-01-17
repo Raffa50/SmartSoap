@@ -6,6 +6,6 @@ namespace Aldrigos.SmartSoap
     public interface IEnvelope
     {
         object[] Body { get; }
-        IEnumerable<object> Headers { get; }
+        IEnumerable<object> Header { get; }
     }
 }

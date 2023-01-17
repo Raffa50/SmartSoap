@@ -9,7 +9,7 @@ namespace Aldrigos.SmartSoap
     public class Envelope<T> : IEnvelope where T : class
     {
         public virtual T[] Body { get; set; }
-        public virtual IEnumerable<object> Headers { get; set; } = Enumerable.Empty<object>();
+        public virtual IEnumerable<object> Header { get; set; } = Enumerable.Empty<object>();
         object[] IEnvelope.Body => Body;
 
         public Envelope() { }
@@ -22,7 +22,7 @@ namespace Aldrigos.SmartSoap
         public Envelope(T body, IEnumerable<object> headers)
             :this(body)
         {
-            Headers = headers;
+            Header = headers;
         }
     }
 }
