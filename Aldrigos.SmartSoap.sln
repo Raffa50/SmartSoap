@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aldrigos.SmartSoap", "Aldrigos.SmartSoap\Aldrigos.SmartSoap.csproj", "{724FA103-2932-423B-9486-BBA3E5037548}"
 EndProject
@@ -26,11 +26,9 @@ Global
 		{724FA103-2932-423B-9486-BBA3E5037548}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{724FA103-2932-423B-9486-BBA3E5037548}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73A0E8FC-0852-495B-840F-0F267DC6A141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73A0E8FC-0852-495B-840F-0F267DC6A141}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73A0E8FC-0852-495B-840F-0F267DC6A141}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73A0E8FC-0852-495B-840F-0F267DC6A141}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB1D9BDF-03BA-4CBF-BA3B-E07690A2ADF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB1D9BDF-03BA-4CBF-BA3B-E07690A2ADF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB1D9BDF-03BA-4CBF-BA3B-E07690A2ADF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB1D9BDF-03BA-4CBF-BA3B-E07690A2ADF6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E0208660-6B20-48A4-B055-7DA9363E9EA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
