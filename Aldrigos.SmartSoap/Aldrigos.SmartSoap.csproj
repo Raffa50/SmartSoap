@@ -19,6 +19,7 @@
     <PackageReleaseNotes>may result in serialization-time BREAKING CHANGES from 1.X.X
 public EnumExtensions</PackageReleaseNotes>
     <PackageTags>SOAP, serialization, XML</PackageTags>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@ public EnumExtensions</PackageReleaseNotes>
 
   <ItemGroup>
     <None Include="..\soap-icon.png" Pack="true" PackagePath="\" />
+	<None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

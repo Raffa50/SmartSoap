@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aldrigos.SmartSoap.AspNet",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{F5821D7F-CA84-48D7-B1B2-223A93488375}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aldrigos.SmartSoap.AspNet.TestApi31", "Test\Aldrigos.SmartSoap.AspNet.TestApi\Aldrigos.SmartSoap.AspNet.TestApi31.csproj", "{C4F09F04-9632-4F8C-8884-078EACF09419}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{E0208660-6B20-48A4-B055-7DA9363E9EA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0208660-6B20-48A4-B055-7DA9363E9EA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0208660-6B20-48A4-B055-7DA9363E9EA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4F09F04-9632-4F8C-8884-078EACF09419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4F09F04-9632-4F8C-8884-078EACF09419}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4F09F04-9632-4F8C-8884-078EACF09419}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4F09F04-9632-4F8C-8884-078EACF09419}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,7 +40,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{73A0E8FC-0852-495B-840F-0F267DC6A141} = {F5821D7F-CA84-48D7-B1B2-223A93488375}
 		{AB1D9BDF-03BA-4CBF-BA3B-E07690A2ADF6} = {F5821D7F-CA84-48D7-B1B2-223A93488375}
-		{C4F09F04-9632-4F8C-8884-078EACF09419} = {F5821D7F-CA84-48D7-B1B2-223A93488375}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {07473396-E968-41DF-831B-F22A7C9C2EEA}

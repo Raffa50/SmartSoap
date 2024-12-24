@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Aldrigos.SmartSoap.Extensions;
@@ -8,7 +7,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.IO;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Aldrigos.SmartSoap.AspNet
 {
